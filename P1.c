@@ -3,8 +3,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <ctype.h>
-#include "scanner.h"
-#include "scanner.c"
+#include "testscanner.c"
 #include "token.h"
 
 
@@ -12,6 +11,7 @@ int main(int argc, char *argv[])
 {
 
     token toke;
+    //file input
     if(argc == 2)
     {
         keyStatus = 0;
@@ -27,16 +27,9 @@ int main(int argc, char *argv[])
             printf("File does not exist. Please create a valid input file.\n");
             exit(1);
         }
-        while(1)
-        {
-            if (toke.tkn == eof)
-                break;
-            toke = scanner();
-            printf("token string: %s\n", toke.tokenInstance);
-            printf("token type: %s\n", toke.tokenName);
-            printf("token line number: %d\n\n", toke.lineNum);
-        }
+        testscanner(toke);
     }
+    //keyboard input
     else if(argc == 1)
     {
 
@@ -46,33 +39,12 @@ int main(int argc, char *argv[])
             printf("Enter a string to be processed by the scanner:\n");
             keyboardScan();
         }
-         while(1)
-        {
-            if (toke.tkn == eof)
-                break;
-            toke = scanner();
-            printf("token string: %s\n", toke.tokenInstance);
-            printf("token type: %s\n", toke.tokenName);
-            printf("token line number: %d\n\n", toke.lineNum);
-        }     
+        testscanner(toke);   
     }
     else
     {
         printf("The program was unable to process the given arguments. Try again");
         exit(1);
-    }
-    toke = scanner();
-    printf("token string: %s\n", toke.tokenInstance);
-    printf("token type: %s\n", toke.tokenName);
-    printf("token line number: %d\n\n", toke.lineNum);
-    while(1)
-    {
-        if (toke.tkn == eof)
-        break;
-        toke = scanner();
-        printf("token string: %s\n", toke.tokenInstance);
-        printf("token type: %s\n", toke.tokenName);
-        printf("token line number: %d\n\n", toke.lineNum);
     }
 
 

@@ -6,26 +6,27 @@
 #include <stdlib.h>
 
 
-
-int fsaTable[15][24] = 
-// WS    EOF    a-z    A-Z     0-9      +       -       *       /       %      =      >       <       .     (        )       {        }       [        ]      ,       :       #       ;
-{ {0,    1015,  1,     -1,     2,       7,      8,      3,      3,      3,     11,    4,      5,      3,    6,       6,      6,       6,      6,       6,     6,      6,      3,      6},//s0
-  {1001, 1001,  1,     1,      1,      1001,   1001,   1001,   1001,   1001,  1001,  1001,   1001,   1001,  1001,   1001,   1001,    1001,   1001,    1001,  1001,   1001,   1001,   1001},//idKw token s1
-  {1002, 1002,  1002,  1002,   2,      1002,   1002,   1002,   1002,   1002,  1002,  1002,   1002,   8,     1002,   1002,   1002,    1002,   1002,    1002,  1002,   1002,   1002,   1002},//intg token s2
-  {1003, 1003,  1003,  1003,   1003,   1003,   1003,   1003,   1003,   1003,  1003,  1003,   1003,   1003,  1003,   1003,   1003,    1003,   1003,    1003,  1003,   1003,   1003,   1003},//op token s3
-  {1004, 1004,  1004,  1004,   1004,   1004,   1004,   1004,   1004,   1004,  9,     1004,   1004,   1004,  1004,   1004,   1004,    1004,   1004,    1004,  1004,   1004,   1004,   1004},//gthan token s4
-  {1005, 1005,  1005,  1005,   1005,   1005,   1005,   1005,   1005,   1005,  10,    1005,   1005,   1005,  1005,   1005,   1005,    1005,   1005,    1005,  1005,   1005,   1005,   1005},//lthan token s5
-  {1006, 1006,  1006,  1006,   1006,   1006,   1006,   1006,   1006,   1006,  1006,  1006,   1006,   1006,  1006,   1006,   1006,    1006,   1006,    1006,  1006,   1006,   1006,   1006},//punc token s6
-  {1007, 1007,  1007,  1007,   1007,   13,     1007,   1007,   1007,   1007,  1007,  1007,   1007,   1007,  1007,   1007,   1007,    1007,   1007,    1007,  1007,   1007,   1007,   1007},//plus token s7
-  {1008, 1007,  1008,  1008,   1008,   1008,   14,     1008,   1008,   1008,  1008,  1008,   1008,   1008,  1008,   1008,   1008,    1008,   1008,    1008,  1008,   1008,   1008,   1008},//minus token s8
-  {1009, 1009,  1009,  1009,   1009,   1009,   1009,   1009,   1009,   1009,  1009,  1009,   1009,   1009,  1009,   1009,   1009,    1009,   1009,    1009,  1009,   1009,   1009,   1009},//gthaneq token s9
-  {1010, 1010,  1010,  1010,   1010,   1010,   1010,   1010,   1010,   1010,  1010,  1010,   1010,   1010,  1010,   1010,   1010,    1010,   1010,    1010,  1010,   1010,   1010,   1010},//lthaneq token s10
-  {1011, 1011,  1011,  1011,   1011,   1011,   1011,   1011,   1011,   1011,  12,    1011,   1011,   1011,  1011,   1011,   1011,    1011,   1011,    1011,  1011,   1011,   1011,   1011},//assign token s11
-  {1012, 1012,  1012,  1012,   1012,   1012,   1012,   1012,   1012,   1012,  1012,  1012,   1012,   1012,  1012,   1012,   1012,    1012,   1012,    1012,  1012,   1012,   1012,   1012},//equality token s12
-  {1013, 1013,  1013,  1013,   1013,   1013,   1013,   1013,   1013,   1013,  1013,  1013,   1013,   1013,  1013,   1013,   1013,    1013,   1013,    1013,  1013,   1013,   1013,   1013},//increm token s13
-  {1014, 1014,  1014,  1014,   1014,   1014,   1014,   1014,   1014,   1014,  1014,  1014,   1014,   1014,  1014,   1014,   1014,    1014,   1014,    1014,  1014,   1014,   1014,   1014}//decrem token s14
+//FSA table value for tokens
+int fsaTable[15][25] = 
+// WS    EOF    a-z    A-Z     0-9      +       -       *       /       %      =      >       <       .     (        )       {        }       [        ]      ,       :       #       ;    otherChars
+{ {0,    1015,  1,     -1,     2,       7,      8,      3,      3,      3,     11,    4,      5,      3,    6,       6,      6,       6,      6,       6,     6,      6,      3,      6,     -2},//s0
+  {1001, 1001,  1,     1,      1,      1001,   1001,   1001,   1001,   1001,  1001,  1001,   1001,   1001,  1001,   1001,   1001,    1001,   1001,    1001,  1001,   1001,   1001,   1001,   -2},//idKw token s1
+  {1002, 1002,  1002,  1002,   2,      1002,   1002,   1002,   1002,   1002,  1002,  1002,   1002,   8,     1002,   1002,   1002,    1002,   1002,    1002,  1002,   1002,   1002,   1002,   -2},//intg token s2
+  {1003, 1003,  1003,  1003,   1003,   1003,   1003,   1003,   1003,   1003,  1003,  1003,   1003,   1003,  1003,   1003,   1003,    1003,   1003,    1003,  1003,   1003,   1003,   1003,   -2},//op token s3
+  {1004, 1004,  1004,  1004,   1004,   1004,   1004,   1004,   1004,   1004,  9,     1004,   1004,   1004,  1004,   1004,   1004,    1004,   1004,    1004,  1004,   1004,   1004,   1004,   -2},//gthan token s4
+  {1005, 1005,  1005,  1005,   1005,   1005,   1005,   1005,   1005,   1005,  10,    1005,   1005,   1005,  1005,   1005,   1005,    1005,   1005,    1005,  1005,   1005,   1005,   1005,   -2},//lthan token s5
+  {1006, 1006,  1006,  1006,   1006,   1006,   1006,   1006,   1006,   1006,  1006,  1006,   1006,   1006,  1006,   1006,   1006,    1006,   1006,    1006,  1006,   1006,   1006,   100,    -2},//punc token s6
+  {1007, 1007,  1007,  1007,   1007,   13,     1007,   1007,   1007,   1007,  1007,  1007,   1007,   1007,  1007,   1007,   1007,    1007,   1007,    1007,  1007,   1007,   1007,   1007,   -2},//plus token s7
+  {1008, 1007,  1008,  1008,   1008,   1008,   14,     1008,   1008,   1008,  1008,  1008,   1008,   1008,  1008,   1008,   1008,    1008,   1008,    1008,  1008,   1008,   1008,   1008,   -2},//minus token s8
+  {1009, 1009,  1009,  1009,   1009,   1009,   1009,   1009,   1009,   1009,  1009,  1009,   1009,   1009,  1009,   1009,   1009,    1009,   1009,    1009,  1009,   1009,   1009,   1009,   -2},//gthaneq token s9
+  {1010, 1010,  1010,  1010,   1010,   1010,   1010,   1010,   1010,   1010,  1010,  1010,   1010,   1010,  1010,   1010,   1010,    1010,   1010,    1010,  1010,   1010,   1010,   1010,   -2},//lthaneq token s10
+  {1011, 1011,  1011,  1011,   1011,   1011,   1011,   1011,   1011,   1011,  12,    1011,   1011,   1011,  1011,   1011,   1011,    1011,   1011,    1011,  1011,   1011,   1011,   1011,   -2},//assign token s11
+  {1012, 1012,  1012,  1012,   1012,   1012,   1012,   1012,   1012,   1012,  1012,  1012,   1012,   1012,  1012,   1012,   1012,    1012,   1012,    1012,  1012,   1012,   1012,   1012,   -2},//equality token s12
+  {1013, 1013,  1013,  1013,   1013,   1013,   1013,   1013,   1013,   1013,  1013,  1013,   1013,   1013,  1013,   1013,   1013,    1013,   1013,    1013,  1013,   1013,   1013,   1013,   -2},//increm token s13
+  {1014, 1014,  1014,  1014,   1014,   1014,   1014,   1014,   1014,   1014,  1014,  1014,   1014,   1014,  1014,   1014,   1014,    1014,   1014,    1014,  1014,   1014,   1014,   1014,   -2}//decrem token s14
 
 };
+//variables
 int keyStatus;
 int nextChar;
 int i = 0;
@@ -47,6 +48,7 @@ token scanner(){
 return tokey;
 }
 
+//finds token in table
 token FADriver()
 {
   int state = 0;
@@ -54,14 +56,28 @@ token FADriver()
   token toke;
   toke.tokenInstance = "";
   char *string = "";
+  //assigning token to lexeme via switch statement
+  //each case represents a token in the FSA table
   while(state >-1 && state<1001)
   {
       nextState = fsaTable[state][nextChar];
       switch(nextState)
       {
+        case -2:
+          toke = assignToken(string);
+          toke.tkn = unrecognizedCharacterError;
+          toke.tokenInstance = addChar(string, thisChar);
+          //gets rest of string before whitespace or newline, if char is unrecognized loop will terminate
+          while(isalpha(thisChar) || isdigit(thisChar) && thisChar != EOF){
+            processCharacter();
+            toke.tokenInstance = addChar(toke.tokenInstance, thisChar);
+          }
+          toke = setTokenName(toke);
+          return toke;
+          
         case -1:
           toke = assignToken(string);
-          toke.tkn = ERROR;
+          toke.tkn = capLetterError;
           toke.tokenInstance = addChar(string, thisChar);
           while(isalpha(thisChar) || isdigit(thisChar) && thisChar != EOF){
 					processCharacter();
@@ -175,7 +191,7 @@ token FADriver()
                 }
               }
               toke = assignToken(string);
-              toke.tkn = ERROR;
+              toke.tkn = tooManyError;
               toke = setTokenName(toke);
               return toke;
           }
@@ -189,11 +205,12 @@ token FADriver()
   }
 }
 
+//finds index in fsa table for each character
 void processCharacter(){
 	if(thisChar == '\n'){
 		linenum++;
 	}
-
+  //keyboard or file input
 	if(keyStatus == 0)
     thisChar = fgetc(input);
   else if(keyStatus == 1)
@@ -201,6 +218,7 @@ void processCharacter(){
     thisChar = keyString[i];
     i++;
   }
+  //index for FSAtable
 	switch (thisChar)
   {
      case 32:
@@ -296,10 +314,13 @@ void processCharacter(){
      nextChar = 4;
      else if(thisChar == 0)
      nextChar = 1;
+     else if(thisChar >= 33 && thisChar <=64)
+     nextChar = 24;
      break;
   }
 }
 
+//adds new character to current lexeme
 char* addChar(char *string, char ch)
 {
   int size = strlen(string);
@@ -309,6 +330,7 @@ char* addChar(char *string, char ch)
   return newString;
 }
 
+//initialize token
 token assignToken(char *literal)
 {
   token instance;
@@ -322,6 +344,7 @@ token assignToken(char *literal)
   return instance;
 }
 
+//initilize string for token descriptor
 token setTokenName(token toke)
 {
     switch(toke.tkn)
@@ -373,10 +396,17 @@ token setTokenName(token toke)
       case -1:
         toke.tokenName = "ERROR - Variable starting with capital letter";
         break;
+      case -2:
+        toke.tokenName = "ERROR - unrecognized character";
+        break;
+      case -3:
+        toke.tokenInstance = "ERROR - too many characters in identifier";
+        break;
     }
     return toke;
 }
 
+//process keyboard input
 void keyboardScan()
 {
     scanf("%[^\n]", keyInput);
