@@ -1,0 +1,4 @@
+void function2 {
+    let x = 123 ;
+    const y=4567890 ;
+}
