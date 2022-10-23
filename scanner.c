@@ -68,7 +68,7 @@ token FADriver()
           toke.tkn = unrecognizedCharacterError;
           toke.tokenInstance = addChar(string, thisChar);
           //gets rest of string before whitespace or newline, if char is unrecognized loop will terminate
-          while(isalpha(thisChar) || isdigit(thisChar) && thisChar != EOF){
+          while(thisChar >= 33 && thisChar <=64){
             processCharacter();
             toke.tokenInstance = addChar(toke.tokenInstance, thisChar);
           }
@@ -189,6 +189,8 @@ token FADriver()
                   thisChar = keyString[i];
                   i++;
                 }
+                else if(keyStatus ==2 )
+                  thisChar = getchar();
               }
               toke = assignToken(string);
               toke.tkn = tooManyError;
@@ -218,6 +220,8 @@ void processCharacter(){
     thisChar = keyString[i];
     i++;
   }
+  else if(keyStatus == 2)
+    thisChar = getchar();
   //index for FSAtable
 	switch (thisChar)
   {

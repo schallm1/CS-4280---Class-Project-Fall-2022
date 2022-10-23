@@ -29,15 +29,20 @@ int main(int argc, char *argv[])
         }
         testscanner(toke);
     }
-    //keyboard input
+    //standard input
     else if(argc == 1)
     {
-
+        //keyboard input
         if(isatty(STDIN_FILENO))
         {
             keyStatus = 1;
             printf("Enter a string to be processed by the scanner:\n");
             keyboardScan();
+        }
+        //file input
+        else
+        {
+            keyStatus = 2;
         }
         testscanner(toke);   
     }
