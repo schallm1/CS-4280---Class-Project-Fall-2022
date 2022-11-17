@@ -1,4 +1,7 @@
-void function2 jlu& {
-    let x = 123 ;
-    const y=4567890 ;
-}
+var x : 1 ;
+begin
+  scan x ;
+  loop ( x <= 2 ) 
+    fork ( x >= 1 ) then
+        print ( 1 ) ; ; ;
+end
