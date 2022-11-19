@@ -28,6 +28,7 @@ int main(int argc, char *argv[])
             printf("File does not exist. Please create a valid input file.\n");
             exit(1);
         }
+        //parser calla and preorder printout
         treeRoot = parser();
         preOrder(treeRoot);
     }

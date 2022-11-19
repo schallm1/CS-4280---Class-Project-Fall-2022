@@ -5,8 +5,16 @@
 
 typedef struct BNF
 {
-    token tkn1;
-    token tkn2;
+    token leftTkn1;
+    token leftTkn2;
+    token leftTkn3;
+    token leftTkn4;
+    token leftTkn5;
+    token rightTkn1;
+    token rightTkn2;
+    token rightTkn3;
+    token rightTkn4;
+    token midTkn4;
     int bnfLevel;
     
     //the most possible definitional subunits in all nonterminals
@@ -18,7 +26,7 @@ typedef struct BNF
     char *bnfName;
 
 } BNF;
-
+//BNF prototypes
 void newline();
 BNF* parser();
 BNF *program();
@@ -39,6 +47,8 @@ BNF* iff(int);
 BNF* loop(int);
 BNF* Assign(int);
 BNF* RO(int);
+token tk;
+int level;
 
 
 #endif

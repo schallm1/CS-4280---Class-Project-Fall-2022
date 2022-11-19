@@ -4,13 +4,9 @@
 #include "scanner.h"
 #include "parser.h"
 
-token tk;
-int level;
-
 BNF* parser()
 {
     tk = scanner();
-    fprintf(stderr, "Token: %s, type: %d\n", tk.tokenInstance, tk.tkn);
     newline();
     if(tk.tkn == eof)
     {
@@ -53,17 +49,19 @@ BNF* block(int level)
 {
     level++;
     BNF* Block = getDef("<block>", level);
+    //begin token
     if(tk.tkn == idKw && strstr(tk.tokenInstance,"begin")!=NULL)
     {  
+        Block->leftTkn1 = tk;
         tk=scanner();
-        fprintf(stderr, "Token: %s, type: %d, BNF: %s\n", tk.tokenInstance, tk.tkn, Block->bnfName);
         newline();
         Block->unit1 = vars(level);
         Block->unit2 = stats(level);
+        //end token
         if(tk.tkn == idKw && strstr(tk.tokenInstance, "end")!=NULL)
         {
+            Block->rightTkn2 = tk;
             tk = scanner();
-            fprintf(stderr, "Token: %s, type: %d, BNF: %s\n", tk.tokenInstance, tk.tkn, Block->bnfName);
             newline();
             return Block;
         }
@@ -84,33 +82,33 @@ BNF* vars(int level)
 {
     level++;
     BNF* Vars = getDef("<vars>", level);
-
+    //var token
     if(tk.tkn == idKw && strstr(tk.tokenInstance, "var")!=NULL)
     {
+        Vars->leftTkn1 = tk;
         tk=scanner();
-        fprintf(stderr, "Token: %s, type: %d, BNF: %s\n", tk.tokenInstance, tk.tkn, Vars->bnfName);
         newline();
+        //id token
         if(tk.tkn == idKw && strstr(tk.tokenInstance, "begin")==NULL && strstr(tk.tokenInstance, "end")==NULL && strstr(tk.tokenInstance, "var")==NULL && strstr(tk.tokenInstance, "fork")==NULL && strstr(tk.tokenInstance, "loop")==NULL && strstr(tk.tokenInstance, "then")==NULL && strstr(tk.tokenInstance, "scan")==NULL && strstr(tk.tokenInstance, "print") ==NULL)
         {
-            Vars->tkn1 = tk;
+            Vars->leftTkn2 = tk;
             tk = scanner();
-            fprintf(stderr, "Token: %s, type: %d, BNF: %s\n", tk.tokenInstance, tk.tkn, Vars->bnfName);
             newline();
             if(tk.tkn == punc && strstr(tk.tokenInstance,":")!=NULL)
             {
+                Vars->leftTkn3 = tk;
                 tk = scanner();
-                fprintf(stderr, "Token: %s, type: %d, BNF: %s\n", tk.tokenInstance, tk.tkn, Vars->bnfName);
                 newline();
+                //integer token
                 if(tk.tkn == intg)
                 {
-                    Vars->tkn2 = tk;
+                    Vars->leftTkn4 = tk;
                     tk=scanner();
-                    fprintf(stderr, "Token: %s, type: %d, BNF: %s\n", tk.tokenInstance, tk.tkn, Vars->bnfName);
                     newline();
                     if(tk.tkn == punc && strstr(tk.tokenInstance, ";") != NULL)
                     {
+                        Vars->leftTkn5 = tk;
                         tk=scanner();
-                        fprintf(stderr, "Token: %s, type: %d, BNF: %s\n", tk.tokenInstance, tk.tkn, Vars->bnfName);
                         newline();
                         Vars->unit1 = vars(level);
                         return Vars;
@@ -153,9 +151,8 @@ BNF* expr(int level)
 
     if(tk.tkn == increm)
     {   
-        Exp->tkn1 = tk;
+        Exp->rightTkn1 = tk;
         tk = scanner();
-        fprintf(stderr, "Token: %s, type: %d, BNF: %s\n", tk.tokenInstance, tk.tkn, Exp->bnfName);
         newline();
         Exp->unit2 = expr(level);
         return Exp;
@@ -175,9 +172,8 @@ BNF* A(int level)
 
     if(tk.tkn == decrem)
     {
-        a->tkn1 = tk;
+        a->rightTkn1 = tk;
         tk = scanner();
-        fprintf(stderr, "Token: %s, type: %d, BNF: %s\n", tk.tokenInstance, tk.tkn, a->bnfName);
         newline();
         a->unit2 = A(level);
         return a;
@@ -197,9 +193,8 @@ BNF* N(int level)
 
     if(tk.tkn == op && (strstr(tk.tokenInstance, "/")!=NULL || strstr(tk.tokenInstance, "*")!=NULL))
     {
-        n->tkn1 = tk;
+        n->rightTkn1 = tk;
         tk = scanner();
-        fprintf(stderr, "Token: %s, type: %d, BNF: %s\n", tk.tokenInstance, tk.tkn, n->bnfName);
         newline();
         n->unit2 = N(level);
         return n;
@@ -217,8 +212,8 @@ BNF* M(int level)
     BNF *m = getDef("<M>", level);
     if(tk.tkn == decrem)
     {
+        m->leftTkn1 = tk;
         tk = scanner();
-        fprintf(stderr, "Token: %s, type: %d, BNF: %s\n", tk.tokenInstance, tk.tkn, m->bnfName);
         newline();
         m->unit1 = M(level);
         return m;
@@ -238,14 +233,14 @@ BNF* R(int level)
 
     if(tk.tkn == punc && strstr(tk.tokenInstance, "[") != NULL)
     {
+        r->leftTkn1 = tk;
         tk = scanner();
-        fprintf(stderr, "Token: %s, type: %d, BNF: %s\n", tk.tokenInstance, tk.tkn, r->bnfName);
         newline();
         r->unit1 = expr(level);
         if (tk.tkn == punc && strstr(tk.tokenInstance, "]") != NULL)
         {
+            r->rightTkn1 = tk;
             tk = scanner();
-            fprintf(stderr, "Token: %s, type: %d, BNF: %s\n", tk.tokenInstance, tk.tkn, r->bnfName);
             newline();
             return r;
         }
@@ -258,17 +253,15 @@ BNF* R(int level)
     }
     else if(tk.tkn == idKw && strstr(tk.tokenInstance, "begin")==NULL && strstr(tk.tokenInstance, "end")==NULL && strstr(tk.tokenInstance, "var")==NULL && strstr(tk.tokenInstance, "fork")==NULL && strstr(tk.tokenInstance, "loop")==NULL && strstr(tk.tokenInstance, "then")==NULL && strstr(tk.tokenInstance, "scan")==NULL && strstr(tk.tokenInstance, "print") ==NULL)
     {
-        r->tkn1 = tk;
+        r->leftTkn1 = tk;
         tk = scanner();
-        fprintf(stderr, "Token: %s, type: %d, BNF: %s\n", tk.tokenInstance, tk.tkn, r->bnfName);
         newline();
         return r;
     }
     else if(tk.tkn == intg)
     {
-        r->tkn1 = tk;
+        r->leftTkn1 = tk;
         tk = scanner();
-        fprintf(stderr, "Token: %s, type: %d, BNF: %s\n", tk.tokenInstance, tk.tkn, r->bnfName);
         newline();
         return r;
     }
@@ -346,8 +339,8 @@ BNF* stat(int level)
         }
         if(tk.tkn == punc && strstr(tk.tokenInstance, ";") != NULL)
         {
+            Stat->rightTkn1 = tk;
             tk = scanner();
-            fprintf(stderr, "Token: %s, type: %d, BNF: %s\n", tk.tokenInstance, tk.tkn, Stat->bnfName);
             newline();
             return Stat;
         }
@@ -371,14 +364,13 @@ BNF* in(int level)
 
     if(tk.tkn == idKw && strstr(tk.tokenInstance, "scan") !=NULL)
     {
+        In->leftTkn1 = tk;
         tk = scanner();
-        fprintf(stderr, "Token: %s, type: %d, BNF: %s\n", tk.tokenInstance, tk.tkn, In->bnfName);
         newline();
         if(tk.tkn == idKw && strstr(tk.tokenInstance, "begin")==NULL && strstr(tk.tokenInstance, "end")==NULL && strstr(tk.tokenInstance, "var")==NULL && strstr(tk.tokenInstance, "fork")==NULL && strstr(tk.tokenInstance, "loop")==NULL && strstr(tk.tokenInstance, "then")==NULL && strstr(tk.tokenInstance, "scan")==NULL && strstr(tk.tokenInstance, "print") ==NULL)
         {
-            In->tkn1 = tk;
+            In->leftTkn2 = tk;
             tk = scanner();
-            fprintf(stderr, "Token: %s, type: %d, BNF: %s\n", tk.tokenInstance, tk.tkn, In->bnfName);
             newline();
             return In;
         }
@@ -402,19 +394,19 @@ BNF *out(int level)
     
     if(tk.tkn == idKw && strstr(tk.tokenInstance, "print")!=NULL)
     {
+        Out->leftTkn1 = tk;
         tk = scanner();
-        fprintf(stderr, "Token: %s, type: %d, BNF: %s\n", tk.tokenInstance, tk.tkn, Out->bnfName);
         newline();
         if(tk.tkn == punc && strstr(tk.tokenInstance, "(") != NULL)
         {
+            Out->leftTkn2 = tk;
             tk = scanner();
-            fprintf(stderr, "Token: %s, type: %d, BNF: %s\n", tk.tokenInstance, tk.tkn, Out->bnfName);
             newline();
             Out->unit1 = expr(level);
             if(tk.tkn == punc && strstr(tk.tokenInstance, ")")!=NULL)
             {
+                Out->rightTkn1 = tk;
                 tk = scanner();
-                fprintf(stderr, "Token: %s, type: %d, BNF: %s\n", tk.tokenInstance, tk.tkn, Out->bnfName);
                 newline();
                 return Out;
             }
@@ -444,26 +436,26 @@ BNF* iff(int level)
 
     if(tk.tkn == idKw && strstr(tk.tokenInstance, "fork") != NULL)
     {
+        If->leftTkn1 = tk;
         tk = scanner();
-        fprintf(stderr, "Token: %s, type: %d, BNF: %s\n", tk.tokenInstance, tk.tkn, If->bnfName);
         newline();
         if(tk.tkn == punc && strstr(tk.tokenInstance, "(") != NULL)
         {
+            If->leftTkn2 = tk;
             tk=scanner();
-            fprintf(stderr, "Token: %s, type: %d, BNF: %s\n", tk.tokenInstance, tk.tkn, If->bnfName);
             newline();
             If->unit1 = expr(level);
             If->unit2 = RO(level);
             If->unit3 = expr(level);
             if(tk.tkn == punc && strstr(tk.tokenInstance, ")") != NULL)
             {
+                If->rightTkn3 = tk;
                 tk=scanner();
-                fprintf(stderr, "Token: %s, type: %d, BNF: %s\n", tk.tokenInstance, tk.tkn, If->bnfName);
                 newline();
                 if(tk.tkn == idKw && strstr(tk.tokenInstance, "then") !=NULL)
                 {
+                    If->midTkn4 = tk;
                     tk = scanner();
-                    fprintf(stderr, "Token: %s, type: %d, BNF: %s\n", tk.tokenInstance, tk.tkn, If->bnfName);
                     newline();
                     If->unit4 = stat(level);
                     return If;
@@ -500,21 +492,21 @@ BNF* loop(int level)
 
     if(tk.tkn == idKw && strstr(tk.tokenInstance, "loop") != NULL)
     {
+        Loop->leftTkn1 = tk;
         tk = scanner();
-        fprintf(stderr, "Token: %s, type: %d, BNF: %s\n", tk.tokenInstance, tk.tkn, Loop->bnfName);
         newline();
         if(tk.tkn == punc && strstr(tk.tokenInstance, "(") != NULL)
         {
+            Loop->leftTkn2 = tk;
             tk=scanner();
-            fprintf(stderr, "Token: %s, type: %d, BNF: %s\n", tk.tokenInstance, tk.tkn, Loop->bnfName);
             newline();
             Loop->unit1 = expr(level);
             Loop->unit2 = RO(level);
             Loop->unit3 = expr(level);
             if(tk.tkn == punc && strstr(tk.tokenInstance, ")") != NULL)
             {
+                Loop->rightTkn3 = tk;
                 tk=scanner();
-                fprintf(stderr, "Token: %s, type: %d, BNF: %s\n", tk.tokenInstance, tk.tkn, Loop->bnfName);
                 newline();
                 Loop->unit4 = stat(level);
                 return Loop;
@@ -545,14 +537,13 @@ BNF *Assign(int level)
 
     if(tk.tkn == idKw && strstr(tk.tokenInstance, "begin")==NULL && strstr(tk.tokenInstance, "end")==NULL && strstr(tk.tokenInstance, "var")==NULL && strstr(tk.tokenInstance, "fork")==NULL && strstr(tk.tokenInstance, "loop")==NULL && strstr(tk.tokenInstance, "then")==NULL && strstr(tk.tokenInstance, "scan")==NULL && strstr(tk.tokenInstance, "print") ==NULL)
     {
-        assign->tkn1 = tk;
+        assign->leftTkn1 = tk;
         tk = scanner();
-        fprintf(stderr, "Token: %s, type: %d, BNF: %s\n", tk.tokenInstance, tk.tkn, assign->bnfName);
         newline();
         if(tk.tkn == equality)
         {
+            assign->leftTkn2 = tk;
             tk = scanner();
-            fprintf(stderr, "Token: %s, type: %d, BNF: %s\n", tk.tokenInstance, tk.tkn, assign->bnfName);
             newline();
             assign->unit1 = expr(level);
             return assign;
@@ -577,9 +568,8 @@ BNF *RO(int level)
 
     if(tk.tkn == lthaneq || tk.tkn == gthaneq || tk.tkn == assign || (tk.tkn == op && strstr(tk.tokenInstance, "%%") != NULL))
     {
-        rO->tkn1 = tk;
+        rO->leftTkn1 = tk;
         tk = scanner();
-        fprintf(stderr, "Token: %s, type: %d, BNF: %s\n", tk.tokenInstance, tk.tkn, rO->bnfName);
         newline();
         return rO;
     }
@@ -595,7 +585,6 @@ void newline()
     if(tk.tkn == newLine)
     {
         tk = scanner();
-        fprintf(stderr, "Token: %s, type: %d\n", tk.tokenInstance, tk.tkn);
         newline();
     }
 }
