@@ -148,7 +148,7 @@ BNF* expr(int level)
     level++;
     BNF* Exp = getDef("<exp>", level);
     Exp->unit1=A(level);
-
+    //incrementor token
     if(tk.tkn == increm)
     {   
         Exp->rightTkn1 = tk;
@@ -169,7 +169,7 @@ BNF* A(int level)
     level++;
     BNF *a = getDef("<A>", level);
     a->unit1 = N(level);
-
+    //decrement token
     if(tk.tkn == decrem)
     {
         a->rightTkn1 = tk;
@@ -190,7 +190,7 @@ BNF* N(int level)
     level++;
     BNF *n = getDef("<N>", level);
     n->unit1 = M(level);
-
+    //multiplication or division operator token
     if(tk.tkn == op && (strstr(tk.tokenInstance, "/")!=NULL || strstr(tk.tokenInstance, "*")!=NULL))
     {
         n->rightTkn1 = tk;
@@ -210,6 +210,7 @@ BNF* M(int level)
 {
     level++;
     BNF *m = getDef("<M>", level);
+    //decrement token
     if(tk.tkn == decrem)
     {
         m->leftTkn1 = tk;
@@ -230,13 +231,14 @@ BNF* R(int level)
 {
     level++;
     BNF *r = getDef("<R>", level);
-
+    //left bracket token
     if(tk.tkn == punc && strstr(tk.tokenInstance, "[") != NULL)
     {
         r->leftTkn1 = tk;
         tk = scanner();
         newline();
         r->unit1 = expr(level);
+        //right bracket token
         if (tk.tkn == punc && strstr(tk.tokenInstance, "]") != NULL)
         {
             r->rightTkn1 = tk;
@@ -286,7 +288,7 @@ BNF *mStat(int level)
 {
     level++;
     BNF *mstat = getDef("<mStat>", level);
-
+    //end keyword token
     if(tk.tkn == idKw && strstr(tk.tokenInstance, "end") ==NULL)
     {
         newline();
@@ -304,7 +306,7 @@ BNF* stat(int level)
 {
     level++;
     BNF *Stat = getDef("<stat>", level);
-
+    //keyword token
     if(tk.tkn == idKw)
     {
         if(strstr(tk.tokenInstance, "scan") != NULL)
@@ -337,6 +339,7 @@ BNF* stat(int level)
             fprintf(stderr, "Error. No proper BNF definition found inside of <stat>.\n");
             exit(0);
         }
+        //semicolon token
         if(tk.tkn == punc && strstr(tk.tokenInstance, ";") != NULL)
         {
             Stat->rightTkn1 = tk;
@@ -361,12 +364,13 @@ BNF* in(int level)
 {
     level++;
     BNF* In = getDef("<in>", level);
-
+    //scan token
     if(tk.tkn == idKw && strstr(tk.tokenInstance, "scan") !=NULL)
     {
         In->leftTkn1 = tk;
         tk = scanner();
         newline();
+        //id token
         if(tk.tkn == idKw && strstr(tk.tokenInstance, "begin")==NULL && strstr(tk.tokenInstance, "end")==NULL && strstr(tk.tokenInstance, "var")==NULL && strstr(tk.tokenInstance, "fork")==NULL && strstr(tk.tokenInstance, "loop")==NULL && strstr(tk.tokenInstance, "then")==NULL && strstr(tk.tokenInstance, "scan")==NULL && strstr(tk.tokenInstance, "print") ==NULL)
         {
             In->leftTkn2 = tk;
@@ -391,18 +395,20 @@ BNF *out(int level)
 {
     level++;
     BNF *Out = getDef("<out>", level);
-    
+    //print token
     if(tk.tkn == idKw && strstr(tk.tokenInstance, "print")!=NULL)
     {
         Out->leftTkn1 = tk;
         tk = scanner();
         newline();
+        //left parenthesis token
         if(tk.tkn == punc && strstr(tk.tokenInstance, "(") != NULL)
         {
             Out->leftTkn2 = tk;
             tk = scanner();
             newline();
             Out->unit1 = expr(level);
+            //right parenthesis token
             if(tk.tkn == punc && strstr(tk.tokenInstance, ")")!=NULL)
             {
                 Out->rightTkn1 = tk;
@@ -433,12 +439,13 @@ BNF* iff(int level)
 {
     level++;
     BNF *If = getDef("<if>", level);
-
+    //fork token
     if(tk.tkn == idKw && strstr(tk.tokenInstance, "fork") != NULL)
     {
         If->leftTkn1 = tk;
         tk = scanner();
         newline();
+        //left parenthesis token
         if(tk.tkn == punc && strstr(tk.tokenInstance, "(") != NULL)
         {
             If->leftTkn2 = tk;
@@ -447,11 +454,13 @@ BNF* iff(int level)
             If->unit1 = expr(level);
             If->unit2 = RO(level);
             If->unit3 = expr(level);
+            //right parenthesis token
             if(tk.tkn == punc && strstr(tk.tokenInstance, ")") != NULL)
             {
                 If->rightTkn3 = tk;
                 tk=scanner();
                 newline();
+                //then token
                 if(tk.tkn == idKw && strstr(tk.tokenInstance, "then") !=NULL)
                 {
                     If->midTkn4 = tk;
@@ -489,12 +498,13 @@ BNF* loop(int level)
 {
     level++;
     BNF *Loop = getDef("<if>", level);
-
+    //loop token
     if(tk.tkn == idKw && strstr(tk.tokenInstance, "loop") != NULL)
     {
         Loop->leftTkn1 = tk;
         tk = scanner();
         newline();
+        //left parenthesis token
         if(tk.tkn == punc && strstr(tk.tokenInstance, "(") != NULL)
         {
             Loop->leftTkn2 = tk;
@@ -503,6 +513,7 @@ BNF* loop(int level)
             Loop->unit1 = expr(level);
             Loop->unit2 = RO(level);
             Loop->unit3 = expr(level);
+            //right parenthesis token
             if(tk.tkn == punc && strstr(tk.tokenInstance, ")") != NULL)
             {
                 Loop->rightTkn3 = tk;
@@ -534,12 +545,13 @@ BNF *Assign(int level)
 {
     level++;
     BNF *assign = getDef("<assign>", level);
-
+    //id token
     if(tk.tkn == idKw && strstr(tk.tokenInstance, "begin")==NULL && strstr(tk.tokenInstance, "end")==NULL && strstr(tk.tokenInstance, "var")==NULL && strstr(tk.tokenInstance, "fork")==NULL && strstr(tk.tokenInstance, "loop")==NULL && strstr(tk.tokenInstance, "then")==NULL && strstr(tk.tokenInstance, "scan")==NULL && strstr(tk.tokenInstance, "print") ==NULL)
     {
         assign->leftTkn1 = tk;
         tk = scanner();
         newline();
+        //equality token
         if(tk.tkn == equality)
         {
             assign->leftTkn2 = tk;
@@ -565,7 +577,7 @@ BNF *RO(int level)
 {
     level++;
     BNF *rO = getDef("<RO>", level);
-
+    //relational operator token, assign token, or modulus operator token
     if(tk.tkn == lthaneq || tk.tkn == gthaneq || tk.tkn == assign || (tk.tkn == op && strstr(tk.tokenInstance, "%%") != NULL))
     {
         rO->leftTkn1 = tk;
@@ -582,6 +594,7 @@ BNF *RO(int level)
 
 void newline()
 {
+    //newline token
     if(tk.tkn == newLine)
     {
         tk = scanner();

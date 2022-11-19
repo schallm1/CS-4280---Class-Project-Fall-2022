@@ -6,7 +6,7 @@ void preOrder(BNF *root)
     printf("  ");
 
     printf("%s\n", root->bnfName);
-
+    //printf left-hand tokens first
     if(root->leftTkn1.tokenInstance)
     {
         for(int i =0; i<root->bnfLevel; i++)
@@ -37,7 +37,7 @@ void preOrder(BNF *root)
         printf("  ");
         printf("%s\n", root->leftTkn5.tokenInstance);
     }
-
+    //print subunits and righthand tokens plus one exceptional righthand token for <if>
     if(root->unit1)
     {
         preOrder(root->unit1);
