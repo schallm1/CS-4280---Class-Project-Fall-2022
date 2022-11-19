@@ -9,5 +9,5 @@ P2.o: P2.c parser.c scanner.c testTree.c
 
 clean:
 	rm -f P2
-	rm -f P2.o
+	rm -f *.o
 	rm -r -d *.dSYM
