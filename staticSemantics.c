@@ -148,9 +148,8 @@ void staticSem(struct Stack* ST, BNF* bnf, int num)
         {
             char * t = variable();
             staticSem(ST, bnf->unit1, num);
-            fprintf(stderr, "STORE %s\n", t);
+            fprintf(stderr, "STORE %s\nADD %s\n", t,t);
             staticSem(ST, bnf->unit2, num);
-            fprintf(stderr, "ADD %s\n", t);
         }
         else if(bnf->unit1)
         staticSem(ST, bnf->unit1, num);
@@ -164,9 +163,8 @@ void staticSem(struct Stack* ST, BNF* bnf, int num)
             char *t = variable();
             if(bnf->unit1)
             staticSem(ST, bnf->unit1, num);
-            fprintf(stderr, "STORE %s\n", t);
+            fprintf(stderr, "STORE %s\nSUB %s\n", t, t);
             staticSem(ST, bnf->unit2, num);
-            fprintf(stderr, "SUB %s\n", t);
         }
         else if(bnf->unit1)
             staticSem(ST, bnf->unit1, num);
@@ -237,7 +235,7 @@ void staticSem(struct Stack* ST, BNF* bnf, int num)
         if (bnf->leftTkn1.tkn == idKw)
         {
             status = verify(ST, bnf->leftTkn1);
-            if(status == -1)
+            if(!status)
             {
                 printf("ID %s undeclared.\n", bnf->leftTkn1.tokenInstance);
                 exit(1);
@@ -253,23 +251,20 @@ void staticSem(struct Stack* ST, BNF* bnf, int num)
     else if(bnf->bnfName == "<in>")
     {
         status = verify(ST, bnf->leftTkn2);
-        if (status == -1)
+        if (!status)
         {
             printf("ID %s undeclared.\n", bnf->leftTkn2.tokenInstance);
             exit(1);
         }
         char *v = variable();
-        fprintf(stderr, "READ %s\n", v);
-        fprintf(stderr, "LOAD %s\n", v);
-        fprintf(stderr, "STACKW %d\n", status);
+        fprintf(stderr, "READ %s\nLOAD %s\n STACKW %d\n", v,v,status);
     }
     //<out> -> print (<exp>)
     else if(bnf->bnfName == "<out>")
     {
         if(bnf->unit1 != NULL)
             staticSem(ST, bnf->unit1, num);
-        fprintf(stderr, "STORE %s\n", varss[Var-1]);
-        fprintf(stderr, "WRITE %s\n", varss[Var-1]);
+        fprintf(stderr, "STORE %s\nWRITE %s\n", varss[Var-1], varss[Var-1]);
     }
     //<if> -> fork (<exp> <RO> <exp>) then <stat>
     else if(bnf->bnfName == "<if>")
@@ -278,36 +273,23 @@ void staticSem(struct Stack* ST, BNF* bnf, int num)
         int loopIt = f;
         char * v = variable();
 
-        fprintf(stderr, "LOOP%d:\n", loopIt);
+        fprintf(stderr, "LOOP%d:\nSTORE %s\nSUB %s\nfinal: NOOP\n", loopIt, v, v);
         staticSem(ST, bnf->unit1, num);
-        fprintf(stderr, "STORE %s\n", v);
         staticSem(ST, bnf->unit3, num);
-        fprintf(stderr, "SUB %s\n", v);
         staticSem(ST, bnf->unit2, num);
         staticSem(ST, bnf->unit4, num);
-
-        fprintf(stderr, "final: NOOP\n", loopIt);
     }
     //<loop> -> loop ( <exp> <RO> <exp> ) <stat>
     else if(bnf->bnfName == "<loop>")
     {
         char *v = variable();
         f++;
-        int loopNum = f;
 
-        fprintf(stderr, "LOOP%d\n", loopNum);
+        fprintf(stderr, "LOOP%d\nSTORE %s\nSUB %s\nBR LOOP%d\nfinal: NOOP", f,f,f,f,status);
         staticSem(ST, bnf->unit1, num);
-        
-        fprintf(stderr, "STORE %s\n", v);
         staticSem(ST, bnf->unit3, num);
-
-        fprintf(stderr, "SUB %s\n", v);
         staticSem(ST, bnf->unit2, num);
-
         staticSem(ST, bnf->unit4, num);
-
-        fprintf(stderr, "BR LOOP%d\n", loopNum);
-        fprintf(stderr, "final%d: NOOP\n",loopNum);
     }
     //<assign> -> Identifier == <exp> (one == token)
     else if(bnf->bnfName=="<assign>")
@@ -315,7 +297,7 @@ void staticSem(struct Stack* ST, BNF* bnf, int num)
         if(bnf->unit1 != NULL)
             staticSem(ST, bnf->unit1, num);
         status = verify(ST, bnf->leftTkn1);
-        if (status == -1)
+        if (!status)
         {
             printf("ID %s undeclared.\n", bnf->leftTkn1);
             exit(1);
