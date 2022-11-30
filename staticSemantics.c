@@ -37,8 +37,7 @@ char *variable()
 {
     
     asprintf(&tp, "var%d", Var);
-    varss[Var] = tp;
-    Var++;
+    varss[Var++] = tp;
     return tp;
 
 }
@@ -102,10 +101,10 @@ void staticSem(struct Stack* ST, BNF* bnf, int num)
     if(strstr(bnf->bnfName,"<program>")!=NULL)
     {
         int n = 0;
-        if(bnf->unit1 != NULL)
+        if(bnf->unit1)
             staticSem(ST, bnf->unit1, n);
 
-        if(bnf->unit2 != NULL)
+        if(bnf->unit2)
             staticSem(ST, bnf->unit2, n);
 
         for(int i = 0; i<Var; i++)

@@ -1,7 +1,8 @@
 var x : 1 ;
+var y : 2 ;
 begin
-  scan x ;
-  loop ( x <= 2 ) 
-    fork ( x >= 1 ) then
-        print ( 1 ) ; ; ;
+  var z : 3 ;
+  print ( x ) ;
+  print ( y ) ;
+  print ( z ) ;
 end
