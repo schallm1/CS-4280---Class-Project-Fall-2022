@@ -1,13 +1,13 @@
 
-all: P2
+all: P3
 
-P2: P2.o
-	g++ -o P2 P2.o
+P3: P3.o
+	g++ -o P3 P3.o
 
-P2.o: P2.c parser.c scanner.c testTree.c
-	g++ -c P2.c
+P3.o: P3.c parser.c scanner.c testTree.c
+	g++ -c P3.c
 
 clean:
-	rm -f P2
+	rm -f P3
 	rm -f *.o
 	rm -r -d *.dSYM
