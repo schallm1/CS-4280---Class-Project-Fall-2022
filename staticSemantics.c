@@ -268,9 +268,8 @@ void staticSem(struct Stack* ST, BNF* bnf, int num)
     {
         if(bnf->unit1 != NULL)
             staticSem(ST, bnf->unit1, num);
-        char *t = variable();
-        fprintf(stderr, "STORE %s\n", t);
-        fprintf(stderr, "WRITE %s\n", t);
+        fprintf(stderr, "STORE %s\n", varss[Var-1]);
+        fprintf(stderr, "WRITE %s\n", varss[Var-1]);
     }
     //<if> -> fork (<exp> <RO> <exp>) then <stat>
     else if(bnf->bnfName == "<if>")
